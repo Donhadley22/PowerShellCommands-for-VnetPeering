@@ -1,0 +1,31 @@
+Get-AzContext
+
+New-AzResourceGroup -Name Proj-RG -Location eastus
+
+Get-AzResourceGroup
+
+$projVnet1 = New-AzVirtualNetwork -Name Vnet1 -ResourceGroupName Proj-RG -AddressPrefix "10.0.0.0/16" -Location "East US"
+
+Get-AzVirtualNetwork -Name Vnet1
+
+$Subnet1 = Add-AzVirtualNetworkSubnetConfig -Name Subnet1 -AddressPrefix 10.0.1.0/24 -VirtualNetwork $projVnet1
+
+Get-AzVirtualNetworkSubnetConfig -Name Subnet1 -VirtualNetwork $projVnet1 
+
+$Subnet1 | Set-AzVirtualNetwork
+
+$projVnet2 = New-AzVirtualNetwork -Name Vnet2 -ResourceGroupName Proj-RG -AddressPrefix "10.1.0.0/16" -Location "East US"
+
+Get-AzVirtualNetwork -Name Vnet2
+
+$Subnet2 = Add-AzVirtualNetworkSubnetConfig -Name Subnet2 -AddressPrefix 10.1.0.0/24 -VirtualNetwork $projVnet2
+Get-AzVirtualNetworkSubnetConfig -Name Subnet2 -VirtualNetwork $projVnet2 
+
+$Subnet2 | Set-AzVirtualNetwork
+
+Add-AzVirtualNetworkPeering -Name Vnet1-Vnet2 -VirtualNetwork $projVnet1 -RemoteVirtualNetworkId $projVnet2.Id
+
+Add-AzVirtualNetworkPeering -Name Vnet2-Vnet1 -VirtualNetwork $projVnet2 -RemoteVirtualNetworkId $projVnet1.Id
+
+Get-AzResourceGroup | Remove-AzResourceGroup -force -verbose
+
